@@ -1,12 +1,15 @@
 import Navigation from "../components/common/Navigation";
+import Pagination from "../components/common/Pagination";
+import Title from "../components/common/Title";
 import VehicleModelTable from "../components/vehicle/VehicleModelTable";
 
 export default function ListVehiclePage() {
   return (
     <>
       <Navigation />
-      <h1>Vehicle list</h1>
+      <Title />
       <VehicleModelTable />
+      <Pagination />
     </>
   );
 }

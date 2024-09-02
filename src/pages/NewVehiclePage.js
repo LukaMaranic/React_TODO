@@ -1,11 +1,12 @@
 import Navigation from "../components/common/Navigation";
+import Title from "../components/common/Title";
 import NewVehicleForm from "../components/vehicle/NewVehicleForm";
 
 export default function NewVehiclePage() {
   return (
     <>
       <Navigation />
-      <h1>New Vehicle</h1>
+      <Title />
       <NewVehicleForm />
     </>
   );
