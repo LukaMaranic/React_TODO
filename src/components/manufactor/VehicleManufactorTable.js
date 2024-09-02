@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function ManufactorTable() {
   return (
-    <table>
+    <table class="table-auto">
       <thead>
         <tr>
           <th>Id</th>
