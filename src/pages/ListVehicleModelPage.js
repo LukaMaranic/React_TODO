@@ -9,7 +9,6 @@ export default function ListVehiclePage() {
       <Navigation />
       <Title />
       <VehicleModelTable />
-      <Pagination />
     </>
   );
 }
