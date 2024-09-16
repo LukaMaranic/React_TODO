@@ -1,191 +1,176 @@
-import { Link } from "react-router-dom";
+import { observer } from "mobx-react-lite";
+import { useState, useEffect } from "react";
+import VehicleModelStore from "../../store/VehicleModelStore";
+import Pagination from "../common/Pagination";
 
-export default function VehicleModelTable() {
+const VehicleModelTable = observer(() => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(1);
+  const [lastVisible, setLastVisible] = useState(null);
+  const [sortBy, setSortBy] = useState("id");
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [filters, setFilters] = useState({});
+
+  useEffect(() => {
+    //fetchVehicleModels();
+  }, [currentPage, sortBy, sortDirection, filters]);
+
+  const fetchVehicleModels = async () => {
+    const response = await VehicleModelStore.fetchVehicleModels({
+      pageSize,
+      lastVisible,
+      sortBy,
+      sortDirection,
+      filters,
+      currentPage,
+    });
+
+    if (response) {
+      const { vehicleModels, lastVisible: lastDoc } = response;
+      setLastVisible(lastDoc); // Set the last visible document for pagination
+    }
+  };
+
+  const handleSort = (field) => {
+    const direction =
+      sortBy === field && sortDirection === "asc" ? "desc" : "asc";
+    setSortBy(field);
+    setSortDirection(direction);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  /*   const fetchPageData = (newPage) => {
+    VehicleModelStore.fetchNextPage({
+      sortBy,
+      sortDirection,
+      pageSize,
+      currentPage: newPage,
+    });
+  }; */
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => {
+      const newPage = prevPage + 1;
+
+      VehicleModelStore.fetchNextPage({
+        sortBy,
+        sortDirection,
+        pageSize,
+        currentPage: newPage,
+      });
+      return newPage;
+    });
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => {
+      const newPage = Math.max(1, prevPage - 1);
+      VehicleModelStore.fetchNextPage({
+        sortBy,
+        sortDirection,
+        pageSize,
+        currentPage: newPage,
+      });
+      return newPage;
+    });
+  };
+
   return (
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mx-9">
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg mx-9">
+      <div className="mb-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Filter by Name"
+          onChange={handleFilterChange}
+          className="border p-2"
+        />
+      </div>
+      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th scope="col" class="px-6 py-3">
-              <div class="flex items-center">
-                Id
-                <a href="#">
-                  <svg
-                    class="w-3 h-3 ms-1.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
-                  </svg>
-                </a>
-              </div>
+            <th
+              scope="col"
+              className="px-6 py-3"
+              onClick={() => handleSort("id")}
+            >
+              <div className="flex items-center">Id</div>
             </th>
-            <th scope="col" class="px-6 py-3">
-              <div class="flex items-center">
-                Make Id
-                <a href="#">
-                  <svg
-                    class="w-3 h-3 ms-1.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
-                  </svg>
-                </a>
-              </div>
+            <th
+              scope="col"
+              className="px-6 py-3"
+              onClick={() => handleSort("makeId")}
+            >
+              <div className="flex items-center">Make Id</div>
             </th>
-            <th scope="col" class="px-6 py-3">
-              <div class="flex items-center">
-                Name
-                <a href="#">
-                  <svg
-                    class="w-3 h-3 ms-1.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
-                  </svg>
-                </a>
-              </div>
+            <th
+              scope="col"
+              className="px-6 py-3"
+              onClick={() => handleSort("name")}
+            >
+              <div className="flex items-center">Name</div>
             </th>
-            <th scope="col" class="px-6 py-3">
-              <div class="flex items-center">
-                Abrv
-                <a href="#">
-                  <svg
-                    class="w-3 h-3 ms-1.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
-                  </svg>
-                </a>
-              </div>
+            <th
+              scope="col"
+              className="px-6 py-3"
+              onClick={() => handleSort("abrv")}
+            >
+              <div className="flex items-center">Abrv</div>
             </th>
-            <th scope="col" class="px-6 py-3">
-              <div class="flex items-center">
-                Action
-                <a href="#">
-                  <svg
-                    class="w-3 h-3 ms-1.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
-                  </svg>
-                </a>
-              </div>
+            <th scope="col" className="px-6 py-3">
+              Action
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              1
-            </th>
-            <td class="px-6 py-4">1</td>
-            <td class="px-6 py-4">iX M60</td>
-            <td class="px-6 py-4">BWM</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+          {VehicleModelStore.items.length > 0 ? (
+            VehicleModelStore.items.map((item, index) => (
+              <tr
+                className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                key={index}
               >
-                Edit
-              </a>
-            </td>
-          </tr>
-          <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              2
-            </th>
-            <td class="px-6 py-4">1</td>
-            <td class="px-6 py-4">i5</td>
-            <td class="px-6 py-4">BMW</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
-          <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              3
-            </th>
-            <td class="px-6 py-4">2</td>
-            <td class="px-6 py-4">Mustang</td>
-            <td class="px-6 py-4">Ford</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
-          <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              4
-            </th>
-            <td class="px-6 py-4">2</td>
-            <td class="px-6 py-4">Focus</td>
-            <td class="px-6 py-4">Ford</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              5
-            </th>
-            <td class="px-6 py-4">3</td>
-            <td class="px-6 py-4">Golf</td>
-            <td class="px-6 py-4">Volkswagenwerk GmbH</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
+                <th
+                  scope="row"
+                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  {item.id}
+                </th>
+                <td className="px-6 py-4">{item.makeId}</td>
+                <td className="px-6 py-4">{item.name}</td>
+                <td className="px-6 py-4">{item.abrv}</td>
+                <td className="px-6 py-4">
+                  <a
+                    href="#"
+                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                  >
+                    Edit
+                  </a>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="text-center py-4">
+                No data available
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
+      <Pagination
+        currentPage={currentPage}
+        onNextPage={handleNextPage}
+        onPreviousPage={handlePreviousPage}
+      />
     </div>
   );
-}
+});
+
+export default VehicleModelTable;
