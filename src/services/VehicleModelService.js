@@ -6,6 +6,7 @@ import {
   limit,
   getDocs,
   startAt,
+  addDoc,
 } from "firebase/firestore";
 
 class VehicleModelService {
@@ -69,29 +70,47 @@ class VehicleModelService {
       throw error;
     }
   }
-}
-export default VehicleModelService;
 
-/* static async fetchVehicleModels2() {
-  try {
-    const response = await fetch(
-      "https://firestore.googleapis.com/v1/projects/monoapi-85701/databases/(default)/documents/VehicleModels"
-    );
+  static async create(data) {
+    try {
+      const modelsQuery = query(collection(db, "VehicleModels"));
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch vehicle models");
+      const querySnapshot = await getDocs(modelsQuery);
+
+      const idList = querySnapshot.docs.map((doc) => doc.data().id);
+      console.log(idList);
+
+      var lastId = null;
+      switch (true) {
+        case idList.length === 0:
+          lastId = [0];
+          break;
+        case idList.length >= 1:
+          lastId = idList.sort(function (a, b) {
+            return b - a;
+          });
+          break;
+      }
+
+      const id = lastId[0] + 1;
+      data["id"] = id;
+      data["makeId"] = parseInt(data["makeId"]);
+    } catch (error) {
+      console.error("Error fetching id's models: ", error);
+      throw error;
     }
+    try {
+      addDoc(collection(db, "VehicleModels"), {
+        id: data.id,
+        name: data.name,
+        abrv: data.abrv,
+        makeId: data.makeId,
+      });
+    } catch (error) {
+      console.error("Error adding vehicle models: ", error);
+      throw error;
+    }
+  }
+}
 
-    const data = await response.json();
-
-    return data.documents.map((doc) => ({
-      id: doc.fields.Id.integerValue,
-      makeId: doc.fields.MakeId.integerValue,
-      name: doc.fields.Name.stringValue,
-      abrv: doc.fields.Abrv.stringValue,
-    }));
-  } catch (error) {
-    console.log("error: " + error);
-    throw error;
-  } 
-}*/
+export default VehicleModelService;
