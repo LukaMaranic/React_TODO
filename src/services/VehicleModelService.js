@@ -7,6 +7,8 @@ import {
   getDocs,
   startAt,
   addDoc,
+  updateDoc,
+  doc,
 } from "firebase/firestore";
 
 class VehicleModelService {
@@ -28,6 +30,7 @@ class VehicleModelService {
       const querySnapshot = await getDocs(modelsQuery);
 
       const vehicleModels = querySnapshot.docs.map((doc) => ({
+        docId: doc.id,
         id: doc.data().id,
         makeId: doc.data().makeId,
         name: doc.data().name,
@@ -108,6 +111,20 @@ class VehicleModelService {
       });
     } catch (error) {
       console.error("Error adding vehicle models: ", error);
+      throw error;
+    }
+  }
+
+  static async update(data) {
+    const docRef = doc(db, "VehicleModels", data.docId);
+    try {
+      await updateDoc(docRef, {
+        makeId: data.makeId,
+        name: data.name,
+        abrv: data.abrv,
+      });
+    } catch (error) {
+      console.error("Error updating vehicle models: ", error);
       throw error;
     }
   }
