@@ -9,6 +9,7 @@ function Title() {
     "/manufactor-list": "Manufactor List",
     "/new-manufactor": "Add New Manufactor",
     "/new-vehicle": "Add New Vehicle Model",
+    "/update-vehicle": "Update Vehicle Model",
   };
 
   const title = titles[location.pathname] || "";
