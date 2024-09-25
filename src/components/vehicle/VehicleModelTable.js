@@ -2,18 +2,19 @@ import { observer } from "mobx-react-lite";
 import { useState, useEffect } from "react";
 import VehicleModelStore from "../../store/VehicleModelStore";
 import Pagination from "../common/Pagination";
+import { Link, redirect } from "react-router-dom";
 
 const VehicleModelTable = observer(() => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(1);
+  const [pageSize] = useState(10);
   const [lastVisible, setLastVisible] = useState(null);
   const [sortBy, setSortBy] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
   const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    //fetchVehicleModels();
-  }, [currentPage, sortBy, sortDirection, filters]);
+    fetchVehicleModels();
+  }, []);
 
   const fetchVehicleModels = async () => {
     const response = await VehicleModelStore.fetchVehicleModels({
@@ -27,7 +28,7 @@ const VehicleModelTable = observer(() => {
 
     if (response) {
       const { vehicleModels, lastVisible: lastDoc } = response;
-      setLastVisible(lastDoc); // Set the last visible document for pagination
+      setLastVisible(lastDoc);
     }
   };
 
@@ -146,12 +147,19 @@ const VehicleModelTable = observer(() => {
                 <td className="px-6 py-4">{item.name}</td>
                 <td className="px-6 py-4">{item.abrv}</td>
                 <td className="px-6 py-4">
-                  <a
-                    href="#"
+                  <Link
+                    to={"/update-vehicle?id=" + item.id}
+                    state={{
+                      docId: item.docId,
+                      id: item.id,
+                      makeId: item.makeId,
+                      name: item.name,
+                      abrv: item.abrv,
+                    }}
                     className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                   >
                     Edit
-                  </a>
+                  </Link>
                 </td>
               </tr>
             ))
