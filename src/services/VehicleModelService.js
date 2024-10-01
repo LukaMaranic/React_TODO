@@ -8,6 +8,7 @@ import {
   startAt,
   addDoc,
   updateDoc,
+  deleteDoc,
   doc,
 } from "firebase/firestore";
 
@@ -125,6 +126,15 @@ class VehicleModelService {
       });
     } catch (error) {
       console.error("Error updating vehicle models: ", error);
+      throw error;
+    }
+  }
+
+  static async delete(docId) {
+    try {
+      await deleteDoc(doc(db, "VehicleModels", docId));
+    } catch (error) {
+      console.error("Error deleting vehicle models: ", error);
       throw error;
     }
   }

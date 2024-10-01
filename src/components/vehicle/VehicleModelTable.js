@@ -47,15 +47,6 @@ const VehicleModelTable = observer(() => {
     setCurrentPage(page);
   };
 
-  /*   const fetchPageData = (newPage) => {
-    VehicleModelStore.fetchNextPage({
-      sortBy,
-      sortDirection,
-      pageSize,
-      currentPage: newPage,
-    });
-  }; */
-
   const handleNextPage = () => {
     setCurrentPage((prevPage) => {
       const newPage = prevPage + 1;
@@ -81,6 +72,10 @@ const VehicleModelTable = observer(() => {
       });
       return newPage;
     });
+  };
+
+  const handleDelete = (docId) => {
+    VehicleModelStore.deleteVehicleModel(docId);
   };
 
   return (
@@ -160,6 +155,13 @@ const VehicleModelTable = observer(() => {
                   >
                     Edit
                   </Link>
+                  <a
+                    className="px-6 py-4"
+                    href="#"
+                    onClick={() => handleDelete(item.docId)}
+                  >
+                    Delete
+                  </a>
                 </td>
               </tr>
             ))
